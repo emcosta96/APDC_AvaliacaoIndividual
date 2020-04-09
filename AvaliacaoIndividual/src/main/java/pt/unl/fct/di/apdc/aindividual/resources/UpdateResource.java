@@ -10,8 +10,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.datastore.Entity;
@@ -68,16 +66,21 @@ public class UpdateResource {
 			if (country == "" || country == null)
 				country = user.getString("user_country");
 
-			user = Entity.newBuilder(userKey).set("user_name", name).set("user_pwd", DigestUtils.sha512Hex(pwd))
+			user = Entity.newBuilder(userKey).set("user_name", name)
+					.set("user_pwd", pwd)
 					.set("user_email", user.getString("user_email"))
 					.set("user_creation_time", user.getTimestamp("user_creation_time"))
-					.set("user_place", data.getPlace()).set("user_country", data.getCountry()).build();
+					.set("user_place", data.getPlace())
+					.set("user_country", data.getCountry())
+					.set("user_role", user.getString("user_role"))
+					.set("user_status", user.getString("user_status"))
+					.build();
 
 			txn.put(user);
 			LOG.fine("User updated.");
 			txn.commit();
-
 			return Response.ok("{}").build();
+			
 		} finally {
 			if (txn.isActive())
 				txn.rollback();

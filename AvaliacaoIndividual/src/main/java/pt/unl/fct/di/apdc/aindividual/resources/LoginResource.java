@@ -52,25 +52,32 @@ public class LoginResource {
 		try {
 			Key userkey = userKeyFactory.newKey(data.getUsername());
 			Entity user = datastore.get(userkey);
-			if (user != null) {
+			
+			if (user != null && user.getString("user_status").equals("ACTIVE")) {
+				
 				String hashedPWD = user.getString("user_pwd");
 				if (hashedPWD.equals(DigestUtils.sha512Hex(data.getPassword()))) {
 					AuthToken at = new AuthToken(data.getUsername());
 					Key tokenKey = tokenKeyFactory.newKey(at.getTokenID());
-					Entity token = Entity.newBuilder(tokenKey).set("token_username", at.getUsername())
-							.set("token_creation_data", at.getCreationData())
-							.set("token_expiration_data", at.getExpirationData()).build();
+					Entity token = Entity.newBuilder(tokenKey)
+									.set("token_username", at.getUsername())
+									.set("token_creation_data", at.getCreationData())
+									.set("token_expiration_data", at.getExpirationData())
+									.build();
+					
 					txn.add(token);
 					LOG.fine("User " + data.getUsername() + " logged in successfully.");
 					txn.commit();
 					TokenUserData tu= new TokenUserData(at.getUsername(), at.getTokenID(), at.getExpirationData());
 					return Response.ok(g.toJson(tu)).build();
 				}
+				
 				txn.rollback();
 				return Response.status(Status.FORBIDDEN).entity("Wrong username or password.").build();
 			}
+			
 			txn.rollback();
-			return Response.status(Status.FORBIDDEN).entity("Failed login attempt for username: " + data.getUsername())
+			return Response.status(Status.CONFLICT).entity("Failed login attempt for username: " + data.getUsername())
 					.build();
 		} finally {
 			if (txn.isActive())

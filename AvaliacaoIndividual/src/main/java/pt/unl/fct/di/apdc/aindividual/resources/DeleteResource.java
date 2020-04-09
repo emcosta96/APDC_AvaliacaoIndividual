@@ -48,10 +48,24 @@ public class DeleteResource {
 		Transaction txn = datastore.newTransaction();
 		try {
 			Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.getToken().username);
-			txn.delete(userKey, tokenKey);
+			Entity user = datastore.get(userKey);
+			
+			user = Entity.newBuilder(userKey).set("user_name", user.getString("user_name"))
+					.set("user_pwd", user.getString("user_pwd"))
+					.set("user_email", user.getString("user_email"))
+					.set("user_creation_time", user.getTimestamp("user_creation_time"))
+					.set("user_place", user.getString("user_place"))
+					.set("user_country", user.getString("user_country"))
+					.set("user_role", user.getString("user_role"))
+					.set("user_status", "INACTIVE")
+					.build();
+			
+			txn.put(user);
+			txn.delete(tokenKey);
 			LOG.fine("User deleted.");
 			txn.commit();
 			return Response.ok("{}").build();
+			
 		} finally {
 			if (txn.isActive())
 				txn.rollback();

@@ -4,9 +4,9 @@ xmlhttp = new XMLHttpRequest();
 function deleteuser(){
 	
 	var myObj = {
-				password: document.getElementByID("password").value,
-				confirmation: document.getElementByID("confirmation").value,
-				token: localStorage.getItem('token')
+				password: document.getElementById("password").value,
+				confirmation: document.getElementById("confirmation").value,
+				token: JSON.parse(localStorage.getItem('token'))
 				};
 	
 	
@@ -19,7 +19,7 @@ function deleteuser(){
 		}
 	}
 
-	xmlhttp.open("DELETE", "http://localhost:8080/rest/delete", true);
+	xmlhttp.open("DELETE", window.location.protocol + "/rest/delete", true);
 	xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	var myJSON = JSON.stringify(myObj);
 	xmlhttp.send(myJSON);	

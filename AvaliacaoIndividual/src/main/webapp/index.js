@@ -23,7 +23,7 @@ function init() {
 		}
 	}
 
-	xmlhttp.open("GET","http://localhost:8080/rest/register/hasadmin",true);
+	xmlhttp.open("GET", window.location.protocol + "/rest/admin/hasadmin", true);
 	xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xmlhttp.send(null);
 

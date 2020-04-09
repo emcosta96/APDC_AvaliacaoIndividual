@@ -23,7 +23,7 @@ function register(){
 		}
 	}
 
-	xmlhttp.open("POST", "http://localhost:8080/rest/register", true);
+	xmlhttp.open("POST", window.location.protocol + "/rest/register", true);
 	xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	var myJSON = JSON.stringify(myObj);
 	xmlhttp.send(myJSON);	
