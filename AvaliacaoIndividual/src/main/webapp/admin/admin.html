@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<script src="admin.js"></script>
+<style>	
+	div {
+	background-color: #008CBA;
+	color: white;
+	padding: 30px;
+	text-align: left;
+	font-family: calibri light;	
+	}
+	
+	p {
+	font-family: calibri light;
+	margin-top: 30px;
+	margin-left: 20px;
+	font-size: 20px;	
+	}
+	
+	img {
+	background-color: white;
+	margin-top: -75px;
+  	width: 7%;
+  	height: 7%;
+	}
+	
+	label {
+	font-family: calibri light;
+	margin-left: 20px;
+	font-size: 16px;	
+	}
+	
+	input {
+	margin-left: 20px;
+	}
+	
+	button {
+	  background-color: #008CBA;
+	  border: none;
+	  color: white;
+	  padding: 12px 28px;
+	  text-align: center;
+	  display: block;
+  	  margin-left: 20px;
+      font-family: calibri light;
+	  font-size: 16px;
+	  border-radius: 2px;
+	  width: 10.6%;
+	}
+	
+	
+	
+</style>  
+  <head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+    <title>APDC - Individual Evaluation</title>
+  </head>
+  <body>
+  	<div>
+  		<h1>APDC - Individual Evaluation</h1>
+  		<img align="right" alt="fct" src="../img/fct.jpg">  	
+  	</div>
+  	
+  	<p><b><ins>ADMIN REGISTER</ins></b></p>
+  	
+  	<form>
+	  <label for="username"><b>Username:</b></label><br>
+	  <input type="text" id="username" name="username"><br><br>
+	  
+	  <label for="name"><b>Name:</b></label><br>
+	  <input type="text" id="name" name="name"><br><br>
+	  
+	  <label for="email"><b>E-mail:</b></label><br>
+	  <input type="email" id="email" name="email"><br><br>
+	  
+	  <label for="adminpassword"><b>Admin Password:</b></label><br>
+	  <input type="password" id="adminpassword" name="adminpassword"><br><br>
+	  
+	  <label for="password"><b>Password:</b></label><br>
+	  <input type="password" id="password" name="password"><br><br>
+	  
+	  <label for="confirmation"><b>Confirmation:</b></label><br>
+	  <input type="password" id="confirmation" name="confirmation"><br><br>
+	  
+	  <label for="place"><b>Place:</b></label><br>
+	  <input type="text" id="place" name="place"><br><br>
+	  
+	  <label for="country"><b>Country:</b></label><br>
+	  <input type="text" id="country" name="country"><br><br>
+	  
+	  <button type="button" onclick="admin()"><b>Register</b></button>
+	</form>
+	
+  </body>
+</html>
