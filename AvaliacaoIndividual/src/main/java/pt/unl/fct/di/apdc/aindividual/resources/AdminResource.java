@@ -27,6 +27,7 @@ import com.google.cloud.datastore.Transaction;
 import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.google.gson.Gson;
 
+import pt.unl.fct.di.apdc.aindividual.util.ActiveUsersAdminData;
 import pt.unl.fct.di.apdc.aindividual.util.DeleteUserAdminData;
 import pt.unl.fct.di.apdc.aindividual.util.RegisterAdminData;
 
@@ -94,13 +95,28 @@ public class AdminResource {
 
 	@GET
 	@Path("/users")
-	public Response activeUsers() {
+	public Response activeUsers(ActiveUsersAdminData data) {
+
+		if (data.getToken() == null || data.getToken().expirationData < System.currentTimeMillis())
+			return Response.status(Status.UNAUTHORIZED).entity("The session has expired.").build();
+
+		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.getToken().tokenID);
+		Entity token = datastore.get(tokenKey);
+
+		if (token == null || !token.getString("token_username").equals(data.getToken().username))
+			return Response.status(Status.BAD_REQUEST).entity("Operation not allowed.").build();
+
+		Key userAdminKey = datastore.newKeyFactory().setKind("User").newKey(data.getToken().username);
+		Entity userAdmin = datastore.get(userAdminKey);
+
+		if (userAdmin == null || !userAdmin.getString("user_role").equals("ADMIN"))
+			return Response.status(Status.BAD_REQUEST).entity("Operation not allowed.").build();
 
 		Query<Entity> query = Query.newEntityQueryBuilder().setKind("User")
 				.setFilter(PropertyFilter.eq("user_status", "ACTIVE")).build();
 		QueryResults<Entity> users = datastore.run(query);
 
-		List<String> activeUsers = new ArrayList();
+		List<String> activeUsers = new ArrayList<String>();
 
 		while (users.hasNext()) {
 
@@ -144,16 +160,15 @@ public class AdminResource {
 			txn.put(user);
 
 			Query<Entity> query = Query.newEntityQueryBuilder().setKind("Token")
-					.setFilter(PropertyFilter.eq("token_username", "data.getUser()")).build();
+					.setFilter(PropertyFilter.eq("token_username", data.getUser())).build();
 			QueryResults<Entity> tokenQuery = datastore.run(query);
 
 			Entity tokenUser = null;
 
-			if (tokenQuery.hasNext())
+			while (tokenQuery.hasNext()) {
 				tokenUser = tokenQuery.next();
-
-			if (tokenUser != null)
-				txn.delete(token.getKey());
+				txn.delete(tokenUser.getKey());
+			}				
 
 			LOG.fine("User deleted.");
 			txn.commit();

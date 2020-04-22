@@ -14,15 +14,9 @@ function signout() {
 	
 	xmlhttp = new XMLHttpRequest();
 	
-	var token = JSON.parse(localStorage.getItem('token'));
-	
 	var myObj = {
-			username : token.username,
-			tokenID : token.tokenID,
-			expirationData : token.expirationData
+			token: JSON.parse(localStorage.getItem('token'))
 		};
-	
-	console.log(myObj);
 	
 	xmlhttp.onreadystatechange = function() {
 

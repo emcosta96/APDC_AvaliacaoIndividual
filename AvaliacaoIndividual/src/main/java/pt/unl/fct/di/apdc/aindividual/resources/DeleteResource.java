@@ -41,31 +41,32 @@ public class DeleteResource {
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.getToken().tokenID);
 		Entity token = datastore.get(tokenKey);
-		
-		if(token==null || !token.getString("token_username").equals(data.getToken().username))
+
+		if (token == null || !token.getString("token_username").equals(data.getToken().username))
 			return Response.status(Status.BAD_REQUEST).entity("Operation not allowed.").build();
-		
+
 		Transaction txn = datastore.newTransaction();
 		try {
 			Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.getToken().username);
 			Entity user = datastore.get(userKey);
-			
+
+			if (user == null || user.getString("user_status").equals("INACTIVE")) {
+				txn.rollback();
+				return Response.status(Status.CONFLICT).entity("Operation not allowed.").build();
+			}
+
 			user = Entity.newBuilder(userKey).set("user_name", user.getString("user_name"))
-					.set("user_pwd", user.getString("user_pwd"))
-					.set("user_email", user.getString("user_email"))
+					.set("user_pwd", user.getString("user_pwd")).set("user_email", user.getString("user_email"))
 					.set("user_creation_time", user.getTimestamp("user_creation_time"))
-					.set("user_place", user.getString("user_place"))
-					.set("user_country", user.getString("user_country"))
-					.set("user_role", user.getString("user_role"))
-					.set("user_status", "INACTIVE")
-					.build();
-			
+					.set("user_place", user.getString("user_place")).set("user_country", user.getString("user_country"))
+					.set("user_role", user.getString("user_role")).set("user_status", "INACTIVE").build();
+
 			txn.put(user);
 			txn.delete(tokenKey);
 			LOG.fine("User deleted.");
 			txn.commit();
 			return Response.ok("{}").build();
-			
+
 		} finally {
 			if (txn.isActive())
 				txn.rollback();

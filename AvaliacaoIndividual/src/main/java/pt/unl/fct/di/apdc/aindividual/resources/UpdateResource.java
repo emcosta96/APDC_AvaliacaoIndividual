@@ -33,7 +33,7 @@ public class UpdateResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response doUpdate(UpdateData data) {
 		LOG.fine("Attempt to update user");
-		
+
 		if (data.getToken() == null || data.getToken().expirationData < System.currentTimeMillis())
 			return Response.status(Status.UNAUTHORIZED).entity("The session has expired.").build();
 		if (!data.validUpdate())
@@ -41,14 +41,19 @@ public class UpdateResource {
 
 		Key tokenKey = datastore.newKeyFactory().setKind("Token").newKey(data.getToken().tokenID);
 		Entity token = datastore.get(tokenKey);
-		
-		if(token==null || !token.getString("token_username").equals(data.getToken().username))
+
+		if (token == null || !token.getString("token_username").equals(data.getToken().username))
 			return Response.status(Status.BAD_REQUEST).entity("Operation not allowed.").build();
 
 		Transaction txn = datastore.newTransaction();
 		try {
 			Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.getToken().username);
 			Entity user = datastore.get(userKey);
+
+			if (user == null || user.getString("user_status").equals("INACTIVE")) {
+				txn.rollback();
+				return Response.status(Status.CONFLICT).entity("Operation not allowed.").build();
+			}
 
 			String name = data.getName();
 			if (name == "" || name == null)
@@ -66,21 +71,18 @@ public class UpdateResource {
 			if (country == "" || country == null)
 				country = user.getString("user_country");
 
-			user = Entity.newBuilder(userKey).set("user_name", name)
-					.set("user_pwd", pwd)
+			user = Entity.newBuilder(userKey).set("user_name", name).set("user_pwd", pwd)
 					.set("user_email", user.getString("user_email"))
 					.set("user_creation_time", user.getTimestamp("user_creation_time"))
-					.set("user_place", data.getPlace())
-					.set("user_country", data.getCountry())
-					.set("user_role", user.getString("user_role"))
-					.set("user_status", user.getString("user_status"))
+					.set("user_place", data.getPlace()).set("user_country", data.getCountry())
+					.set("user_role", user.getString("user_role")).set("user_status", user.getString("user_status"))
 					.build();
 
 			txn.put(user);
 			LOG.fine("User updated.");
 			txn.commit();
 			return Response.ok("{}").build();
-			
+
 		} finally {
 			if (txn.isActive())
 				txn.rollback();
