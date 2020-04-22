@@ -72,7 +72,7 @@ public class AdminResource {
 			Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.getUsername());
 			Entity user = datastore.get(userKey);
 			if (user != null) {
-				txn.rollback(); // Aborta a transacao
+				txn.rollback();
 				return Response.status(Status.BAD_REQUEST).entity("User already exists.").build();
 			} else {
 				user = Entity.newBuilder(userKey).set("user_name", data.getName())
