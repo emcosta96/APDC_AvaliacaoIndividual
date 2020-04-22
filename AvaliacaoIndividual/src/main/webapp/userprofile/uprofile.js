@@ -31,5 +31,8 @@ function signout() {
 	
 	var myJSON = JSON.stringify(myObj);
 	xmlhttp.send(myJSON);
+	
+	
+	
 
 }

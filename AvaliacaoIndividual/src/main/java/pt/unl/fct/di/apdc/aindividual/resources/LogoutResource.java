@@ -53,5 +53,8 @@ public class LogoutResource {
 				txn.rollback();
 		}
 	}
+	
+	
+	
 
 }

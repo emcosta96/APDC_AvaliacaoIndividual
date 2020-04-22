@@ -81,9 +81,9 @@ public class AdminResource {
 						.set("user_country", data.getCountry()).set("user_role", "ADMIN").set("user_status", "ACTIVE")
 						.build();
 
-				txn.add(user); // Executa a escrita
+				txn.add(user);
 				LOG.fine("User " + data.getUsername() + " registered successfully.");
-				txn.commit(); // Confirma transacao
+				txn.commit();
 				return Response.ok("{}").build();
 			}
 		} finally {
